@@ -19,6 +19,7 @@ func main() {
 	router.Use(cors.Default())
 
 	router.GET("/", routes.GetTodos)
+	router.POST("/", routes.AddTodo)
 
 	router.Run(":" + port)
 }

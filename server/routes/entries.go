@@ -6,19 +6,21 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/I-Maged/go-todo-list/server/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var entryCollection *mongo.Collection = OpenCollection(Client, "TodoList")
+var todoCollection *mongo.Collection = OpenCollection(Client, "TodoList")
 
 func GetTodos(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
 	var entries []bson.M
-	cursor, err := entryCollection.Find(ctx, bson.M{})
+	cursor, err := todoCollection.Find(ctx, bson.M{})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -34,4 +36,26 @@ func GetTodos(c *gin.Context) {
 
 	fmt.Println(entries)
 	c.JSON(http.StatusOK, entries)
+}
+
+func AddTodo(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+
+	var todo models.TodoModel
+
+	if err := c.BindJSON(&todo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	result, insertErr := todoCollection.InsertOne(ctx, todo)
+	if insertErr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Todo entry was not added"})
+		fmt.Println(insertErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
