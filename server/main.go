@@ -20,6 +20,7 @@ func main() {
 
 	router.GET("/", routes.GetTodos)
 	router.POST("/", routes.AddTodo)
+	router.PUT("/:id", routes.UpdateTodo)
 
 	router.Run(":" + port)
 }

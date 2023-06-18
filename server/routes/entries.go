@@ -9,6 +9,7 @@ import (
 	"github.com/I-Maged/go-todo-list/server/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -58,4 +59,38 @@ func AddTodo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+func UpdateTodo(c *gin.Context) {
+	todoID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(todoID)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+	var todo models.TodoModel
+
+	if err := c.BindJSON(&todo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	filter := bson.M{"_id": docID}
+	update := bson.M{
+		"title":   todo.Title,
+		"subject": todo.Subject,
+	}
+
+	result, err := todoCollection.ReplaceOne(
+		ctx,
+		filter,
+		update,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, result.ModifiedCount)
 }
