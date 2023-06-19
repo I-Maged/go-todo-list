@@ -94,3 +94,21 @@ func UpdateTodo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result.ModifiedCount)
 }
+
+func DeleteTodo(c *gin.Context) {
+	entryID := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(entryID)
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+
+	result, err := todoCollection.DeleteOne(ctx, bson.M{"_id": docID})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, result.DeletedCount)
+}
