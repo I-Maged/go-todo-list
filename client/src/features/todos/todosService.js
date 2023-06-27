@@ -10,8 +10,14 @@ const getTodos = async () => {
 	return response.data;
 };
 
+const deleteTodo = async (todoID) => {
+	await axios.delete(`${API_URL}${todoID}`, config);
+	return todoID;
+};
+
 const todosService = {
 	getTodos,
+	deleteTodo,
 };
 
 export default todosService;
