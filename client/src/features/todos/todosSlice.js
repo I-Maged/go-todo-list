@@ -17,6 +17,17 @@ export const getTodos = createAsyncThunk(
 	}
 );
 
+export const addTodo = createAsyncThunk(
+	'todos/addTodo',
+	async (todoData, thunkAPI) => {
+		try {
+			return await todosService.addTodo(todoData);
+		} catch (error) {
+			return thunkAPI.rejectWithValue(extractErrorMessage(error));
+		}
+	}
+);
+
 export const deleteTodo = createAsyncThunk(
 	'todos/delete',
 	async (todoID, thunkAPI) => {
@@ -38,6 +49,9 @@ export const todosSlice = createSlice({
 			})
 			.addCase(getTodos.fulfilled, (state, action) => {
 				state.todos = action.payload;
+			})
+			.addCase(addTodo.fulfilled, (state, action) => {
+				state.todos = [...state.todos, action.payload];
 			})
 			.addCase(deleteTodo.fulfilled, (state, action) => {
 				state.todos = state.todos.filter((todo) => todo._id !== action.payload);

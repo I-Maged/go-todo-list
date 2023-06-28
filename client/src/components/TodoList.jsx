@@ -17,7 +17,7 @@ const TodoList = () => {
 	}
 
 	return (
-		<div className='rounded-lg shadow-lg card bg-base-100 w-5/6'>
+		<div className='rounded-lg shadow-lg card bg-base-100 w-full'>
 			<div className='card-body'>
 				{todos.map((todo) => (
 					<TodoEntry
