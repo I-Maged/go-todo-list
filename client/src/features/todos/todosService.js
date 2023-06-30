@@ -21,6 +21,17 @@ const addTodo = async (todoData) => {
 
 	return newData;
 };
+const updateTodo = async (todoData) => {
+	await axios.put(`${API_URL}${todoData.id}`, todoData, config);
+
+	const newData = {
+		_id: todoData.id,
+		title: todoData.title,
+		subject: todoData.subject,
+	};
+
+	return newData;
+};
 
 const deleteTodo = async (todoID) => {
 	await axios.delete(`${API_URL}${todoID}`, config);
@@ -30,6 +41,7 @@ const deleteTodo = async (todoID) => {
 const todosService = {
 	getTodos,
 	addTodo,
+	updateTodo,
 	deleteTodo,
 };
 

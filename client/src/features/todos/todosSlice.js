@@ -4,6 +4,7 @@ import { extractErrorMessage } from '../../utils';
 
 const initialState = {
 	todos: null,
+	edit: null,
 };
 
 export const getTodos = createAsyncThunk(
@@ -28,6 +29,17 @@ export const addTodo = createAsyncThunk(
 	}
 );
 
+export const updateTodo = createAsyncThunk(
+	'todos/update',
+	async (todoData, thunkAPI) => {
+		try {
+			return await todosService.updateTodo(todoData);
+		} catch (error) {
+			return thunkAPI.rejectWithValue(extractErrorMessage(error));
+		}
+	}
+);
+
 export const deleteTodo = createAsyncThunk(
 	'todos/delete',
 	async (todoID, thunkAPI) => {
@@ -42,6 +54,11 @@ export const deleteTodo = createAsyncThunk(
 export const todosSlice = createSlice({
 	name: 'todos',
 	initialState,
+	reducers: {
+		handleEdit(state, action) {
+			state.edit = action.payload;
+		},
+	},
 	extraReducers: (builder) => {
 		builder
 			.addCase(getTodos.pending, (state) => {
@@ -53,6 +70,15 @@ export const todosSlice = createSlice({
 			.addCase(addTodo.fulfilled, (state, action) => {
 				state.todos = [...state.todos, action.payload];
 			})
+			.addCase(updateTodo.fulfilled, (state, action) => {
+				state.edit = null;
+				state.todos.forEach((todo) => {
+					if (todo._id === action.payload._id) {
+						todo.title = action.payload.title;
+						todo.subject = action.payload.subject;
+					}
+				});
+			})
 			.addCase(deleteTodo.fulfilled, (state, action) => {
 				state.todos = state.todos.filter((todo) => todo._id !== action.payload);
 			});
@@ -60,3 +86,5 @@ export const todosSlice = createSlice({
 });
 
 export default todosSlice.reducer;
+
+export const { handleEdit } = todosSlice.actions;

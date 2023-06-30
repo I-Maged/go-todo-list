@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { deleteTodo } from '../features/todos/todosSlice';
+import { handleEdit } from '../features/todos/todosSlice';
 
 const TodoEntry = ({ todo }) => {
 	const dispatch = useDispatch();
@@ -19,7 +20,12 @@ const TodoEntry = ({ todo }) => {
 				<p className='mb-3'>{todo.subject}</p>
 			</div>
 			<div className='card-actions justify-end mr-3 mb-3'>
-				<button className='btn btn-primary'>Edit</button>
+				<button
+					onClick={() => dispatch(handleEdit(todo))}
+					className='btn btn-primary'
+				>
+					Edit
+				</button>
 				<button
 					onClick={() => handleDelete(todo._id)}
 					className='btn btn-secondary'

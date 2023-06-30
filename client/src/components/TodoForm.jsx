@@ -1,21 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addTodo } from '../features/todos/todosSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateTodo } from '../features/todos/todosSlice';
 
 const TodoForm = () => {
+	const { edit } = useSelector((state) => state.todos);
 	const dispatch = useDispatch();
 
 	const [title, setTitle] = useState('');
 	const [subject, setSubject] = useState('');
 
-	const submitTodo = (e) => {
+	useEffect(() => {
+		if (edit) {
+			setTitle(edit.title);
+			setSubject(edit.subject);
+		}
+	}, [edit]);
+
+	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		dispatch(addTodo({ title, subject }));
+		if (edit) {
+			dispatch(updateTodo({ id: edit._id, title, subject }));
+		} else {
+			dispatch(addTodo({ title, subject }));
+		}
+
+		setTitle('');
+		setSubject('');
 	};
+
+	// const handleAdd = (e) => {
+	// 	e.preventDefault();
+	// 	dispatch(addTodo({ title, subject }));
+	// };
 
 	return (
 		<form
-			onSubmit={submitTodo}
+			onSubmit={handleFormSubmit}
 			className='mb-4 flex justify-between w-full'
 		>
 			<input
@@ -38,7 +59,7 @@ const TodoForm = () => {
 				type='submit'
 				className='btn btn-success'
 			>
-				Add Todo
+				{edit ? 'Edit' : 'Add'}
 			</button>
 		</form>
 	);
